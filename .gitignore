@@ -1,0 +1,6 @@
+node_modules/
+src/models/
+src/utils/
+src/controller
+src/routes
+.env
