@@ -1,6 +1,11 @@
 import mongoose  from "mongoose";
 
 
+
+                
+             
+             
+
 const transactionSchema = new mongoose.Schema({
  
   sender: {
@@ -31,7 +36,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['send-money', 'cash-out', 'cash-in'],
+    enum: ['send-money', 'cash-out', 'cash-in', 'cash-request', 'agent-bonus'],
     required: true
   },
   // status: {

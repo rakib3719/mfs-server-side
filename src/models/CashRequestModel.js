@@ -1,15 +1,20 @@
 import mongoose from "mongoose";
 
 const cashRequestSchema = new mongoose.Schema({
-  agent: {
+  agentMobile: {
     type: String,
-    ref: 'User',
     required: true
   },
-
+  agentDetails: {
+    email: String,
+    
+    name: String,
+    nid: String,
+    accountType: String
+  },
   type: {
     type: String,
-    enum: ['recharge', 'withdraw'],
+    enum: ['recharge', 'cashRequest'],
     required: true
   },
   status: {
@@ -17,10 +22,7 @@ const cashRequestSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   },
-  approvedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+
 }, { timestamps: true });
 
-export const CashRequest =  mongoose.model('CashRequest', cashRequestSchema);
+export const CashRequest = mongoose.model('CashRequest', cashRequestSchema);
