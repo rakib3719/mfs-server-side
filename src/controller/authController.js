@@ -145,17 +145,19 @@ export const login = async (req, res) => {
 
     // JWT Token
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.accountType },
      'Uj3f#kLx8@wZ92!gR4cF^eYqT1Nv$BmP7sHq0Ld9Vx*MzKa6',
       { expiresIn: "7d" }
     );
 
     // Save to cookie
+    const isProd = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
-   
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None", // or "Strict" for more security
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      httpOnly: false,
+      secure: isProd,               // true on Vercel (HTTPS)
+      sameSite: isProd ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // Hide pin
@@ -164,7 +166,8 @@ export const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      data: { user }
+      data: { user },
+      
     });
 
   } catch (error) {
@@ -183,11 +186,11 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    // Clear the cookie that holds the JWT token
+
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only secure in production
-      sameSite: "strict"
+      secure: process.env.NODE_ENV === "production", // true on Vercel
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     });
 
     return res.status(200).json({

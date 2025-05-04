@@ -1,7 +1,9 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
+
+
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req?.cookies?.token;
 
   if (!token) {
     return res.status(401).json({
@@ -11,8 +13,18 @@ export const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, `mongodb+srv://hellow_baby:Zle58aH5a0ndqm98@cluster0.vsivf.mongodb.net/mfs`);
+    const decoded = decodedToken(token);
+
+    if (!decoded) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token",
+      });
+    }
+
     req.user = decoded; 
+
+    console.log(decoded, 'ok lets do somethings');
     next();
   } catch (err) {
     return res.status(400).json({
@@ -26,7 +38,7 @@ export const verifyToken = (req, res, next) => {
 
 
 export const isAdmin = (req, res, next) => {
-    if (req.user.role !== "admin") {
+    if (req?.user?.role !== "admin") {
       return res.status(403).json({
         success: false,
         message: "Access denied. Admins only.",

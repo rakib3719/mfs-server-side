@@ -8,7 +8,7 @@ export const app = express();
 
 app.use(cors({
   origin: [
-    "http://localhost:3000",
+    "http://localhost:3001/",
     "http://localhost:3001",
     "https://mfs-frontend-cyan.vercel.app",
     "https://mfs-frontend-owdm4s45p-rakibs-projects-4437dcbd.vercel.app"

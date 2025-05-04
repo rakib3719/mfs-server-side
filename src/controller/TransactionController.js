@@ -1,6 +1,7 @@
 import { Transaction } from '../models/TransactionModel.js';
 import bcrypt from 'bcrypt';
 import { User } from '../models/userModel.js';
+import jwt from 'jsonwebtoken'
 export const createTransaction = async (req, res) => {
     try {
       const { type, recipientMobile, senderMobile, amount, pin } = req.body;
@@ -165,18 +166,48 @@ export const createTransaction = async (req, res) => {
 
 
 
-  export const getAllTransaction = async(req, res)=>{
+  
+  export const getAllTransaction = async (req, res) => {
     try {
-      const data = await Transaction.find();
-      res.json({
-        success:true,
-        data:data
-      })
-      
+      // Step 1: Get and decode token from cookies
+      const token = req.cookies?.token;
+      if (!token) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+  
+      const decoded = jwt.verify(token, 'Uj3f#kLx8@wZ92!gR4cF^eYqT1Nv$BmP7sHq0Ld9Vx*MzKa6'); 
+      const { role, userId } = decoded;
+  
+     
+      if (role === 'admin') {
+        const data = await Transaction.find();
+        return res.json({ success: true, data });
+      }
+  
+      // Step 3: If agent or user, find user by _id and get mobile number
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+  
+      const mobile = user.mobileNumber;
+  
+      // Step 4: Find transactions where sender or recipient matches mobile number
+      const data = await Transaction.find({
+        $or: [
+          { sender: mobile },
+          { recipient: mobile }
+        ]
+      });
+  
+      res.json({ success: true, data });
+  
     } catch (error) {
       res.status(400).json({
-        message:error?.message,
-        error:error
-      })
+        success: false,
+        message: error?.message,
+        error
+      });
     }
-  }
+  };
+  
